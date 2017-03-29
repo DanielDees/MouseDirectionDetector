@@ -29,7 +29,7 @@ function posMapper () {
 		U: false,
 		D: false,
 		L: false,
-		R: false,
+		R: true,
 	};
 
 	this.init = function() {
@@ -38,6 +38,8 @@ function posMapper () {
 		var run = setInterval(function() { that.update(); }, that.updateTime);
 
 		document.onmousemove = function(e) {
+
+			that.checkDirection(e.pageX, e.pageY);
 		    that.pos.X = e.pageX;
 		    that.pos.Y = e.pageY;
 		};
@@ -48,6 +50,19 @@ function posMapper () {
 		document.getElementById('mouseArea').style.marginLeft = this.pos.X - (this.width / 2) + "px";
 		document.getElementById('mouseArea').style.marginTop = this.pos.Y - (this.height / 2) + "px";
 	};
+
+	this.checkDirection = function(newX, newY) {
+
+		//If mouse is moving in correct direction
+			 if (this.direction.R && newX >= this.pos.X) { return true; console.log("works!"); }
+		else if (this.direction.L && newX <= this.pos.X) { return true; }
+		else if (this.direction.U && newY >= this.pos.Y) { return true; }
+		else if (this.direction.D && newY <= this.pos.Y) { return true; };
+		
+		//If mouse is not moving in correct direction
+		this.updatePointOnPage();
+		return false;
+	}
 
 	this.checkIfStopped = function() {
 		
