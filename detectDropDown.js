@@ -1,7 +1,10 @@
 var map = new posMapper();
-map.init(map);
+map.init('greyArea');
 
 function posMapper () {
+
+	//If in proper document element
+	this.inElArea = false;
 
 	//Mouse location
 	this.pos = { X: 0, Y: 0, };
@@ -11,15 +14,15 @@ function posMapper () {
 	this.mapPos = { X: 0, Y: 0, };
 
 	//Div attributes
-	this.width = 100;
-	this.height = 100;
+	this.width = 60;
+	this.height = 60;
 
 	//Duration since last mouse move
 	this.stopTime = 0;
 	this.maxStopTime = 200;
 
 	//Time between map updates
-	this.updateTime = 16;
+	this.updateTime = 10;
 
 	//Maximum angle off map quadrant before reset
 	this.maxAngle = 45;
@@ -33,16 +36,23 @@ function posMapper () {
 		R: true,
 	};
 
-	this.init = function() {
+	this.init = function(el) {
 
 		var that = this;
 		var run = setInterval(function() { that.update(); }, that.updateTime);
 
+		document.getElementById(el).onmouseover = function() {
+			that.inElArea = true;
+		};
+		document.getElementById(el).onmouseleave = function() {
+			that.inElArea = false;
+		};
 		document.onmousemove = function(e) {
-
-			that.checkDirection(e.pageX, e.pageY);
-		    that.pos.X = e.pageX;
-		    that.pos.Y = e.pageY;
+			if (that.inElArea) {
+				that.checkDirection(e.pageX, e.pageY);
+			    that.pos.X = e.pageX;
+			    that.pos.Y = e.pageY;
+			}
 		};
 	};
 
@@ -51,8 +61,8 @@ function posMapper () {
 		this.mapPos.X = this.pos.X;
 		this.mapPos.Y = this.pos.Y;
 
-		document.getElementById('mouseArea').style.marginLeft = this.pos.X - (this.width / 2) + "px";
-		document.getElementById('mouseArea').style.marginTop = this.pos.Y - (this.height / 2) + "px";
+		document.getElementById('mouseArea').style.left = this.pos.X - (this.width / 2) + "px";
+		document.getElementById('mouseArea').style.top = this.pos.Y - (this.height / 2) + "px";
 	};
 
 	this.getAngle = function() {
@@ -87,7 +97,7 @@ function posMapper () {
 		//If mouse is not moving in correct direction
 		this.updatePointOnPage();
 		return false;
-	}
+	};
 
 	this.checkIfStopped = function() {
 		
@@ -106,15 +116,14 @@ function posMapper () {
 	};
 	
 	this.update = function() {
-		//Detect if mouse is moving
-		//If not moving update the map area
-		//If mouse reverses direction
-		//Wait until it stops again and reset
 
-		this.checkIfStopped();
+		if (this.inElArea) {
 
-		if (this.stopTime > this.maxStopTime) { 
-			this.updatePointOnPage();
-		};
+			this.checkIfStopped();
+
+			if (this.stopTime > this.maxStopTime) { 
+				this.updatePointOnPage();
+			};
+		}
 	};
 }
