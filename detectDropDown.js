@@ -14,8 +14,8 @@ function posMapper () {
 	this.mapPos = { X: 0, Y: 0, };
 
 	//Div attributes
-	this.width = 60;
-	this.height = 60;
+	this.width = 0;
+	this.height = 0;
 
 	//Duration since last mouse move
 	this.stopTime = 0;
@@ -42,9 +42,11 @@ function posMapper () {
 		var run = setInterval(function() { that.update(); }, that.updateTime);
 
 		document.getElementById(el).onmouseover = function() {
+			console.log("in grey");
 			that.inElArea = true;
 		};
 		document.getElementById(el).onmouseleave = function() {
+			console.log('out grey');
 			that.inElArea = false;
 		};
 		document.onmousemove = function(e) {
