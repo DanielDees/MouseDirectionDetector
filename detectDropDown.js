@@ -4,12 +4,26 @@ map.init(map);
 function posMapper () {
 
 	//Map location
-	//this.mapCenter { X: 0, Y: 0, };
 	this.pos = { X: 0, Y: 0, };
+
+	//Stop location
+	this.stopPos = { X: 0, Y: 0, };
+
+	//Div attributes
 	this.width = 100;
 	this.height = 100;
 
-	//Which quadrant to check
+	//Duration since last mouse move
+	this.stopTime = 0;
+	this.maxStopTime = 100;
+
+	//Time between map updates
+	this.updateTime = 16;
+
+	//Maximum angle off map quadrant before reset
+	//this.maxAngle = 45;
+	
+	//Quadrant to check
 	this.direction = {
 
 		U: false,
@@ -18,34 +32,37 @@ function posMapper () {
 		R: false,
 	};
 
-	//Maximum angle off of map quadrant before reset
-	//this.maxAngle = 45;
-
 	this.init = function() {
 
 		var that = this;
-		var run = setInterval(function() { that.update(); }, 16);
+		var run = setInterval(function() { that.update(); }, that.updateTime);
 
 		document.onmousemove = function(e) {
-
 		    that.pos.X = e.pageX;
 		    that.pos.Y = e.pageY;
 		};
 	};
 
-	this.createMap = function() {
+	this.updatePointOnPage = function() {
 		
-		
-	};
-
-	this.drawPointOnPage = function() {
-		
-		//Insert code here...
+		document.getElementById('mouseArea').style.marginLeft = this.pos.X - (this.width / 2) + "px";
+		document.getElementById('mouseArea').style.marginTop = this.pos.Y - (this.height / 2) + "px";
 	};
 
 	this.checkIfStopped = function() {
 		
-		//Insert code here...
+		//If mouse has not moved then update the map area
+		if (this.pos.X == this.stopPos.X && this.pos.Y == this.stopPos.Y) { 
+			
+			this.stopTime += this.updateTime;
+			return true;
+		}
+
+		//If mouse has moved, then reset timer and update last position
+		this.stopPos.X = this.pos.X;
+		this.stopPos.Y = this.pos.Y;
+		this.stopTime = 0;
+		return false;
 	};
 	
 	this.update = function() {
@@ -54,9 +71,10 @@ function posMapper () {
 		//If mouse reverses direction
 		//Wait until it stops again and reset
 
-		document.getElementById('mouseArea').style.marginLeft = this.pos.X - (this.width / 2) + "px";
-		document.getElementById('mouseArea').style.marginTop = this.pos.Y - (this.height / 2) + "px";
+		this.checkIfStopped();
 
-		console.log("X: " + this.pos.X + "Y: " + this.pos.Y);
+		if (this.stopTime > this.maxStopTime) { 
+			this.updatePointOnPage();
+		};
 	};
 }
