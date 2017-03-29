@@ -54,7 +54,7 @@ function posMapper () {
 	this.checkDirection = function(newX, newY) {
 
 		//If mouse is moving in correct direction
-			 if (this.direction.R && newX >= this.pos.X) { return true; console.log("works!"); }
+		if (this.direction.R && newX >= this.pos.X) { return true; }
 		else if (this.direction.L && newX <= this.pos.X) { return true; }
 		else if (this.direction.U && newY >= this.pos.Y) { return true; }
 		else if (this.direction.D && newY <= this.pos.Y) { return true; };
