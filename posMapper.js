@@ -69,7 +69,7 @@ function posMapper () {
 
 	this.setMaxAngle = function(angle) {
 
-		this.angle = angle;
+		this.maxAngle = angle;
 
 		return this;
 	}
