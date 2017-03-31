@@ -14,8 +14,8 @@ function posMapper () {
 	this.mapPos = { X: 0, Y: 0, };
 
 	//Div attributes
-	this.width = 0;
-	this.height = 0;
+	this.width = 60;
+	this.height = 60;
 
 	//Duration since last mouse move
 	this.stopTime = 0;
@@ -64,7 +64,7 @@ function posMapper () {
 		this.mapPos.Y = this.pos.Y;
 
 		document.getElementById('mouseArea').style.left = this.pos.X - (this.width / 2) + "px";
-		document.getElementById('mouseArea').style.top = this.pos.Y - (this.height / 2) + "px";
+		document.getElementById('mouseArea').style.top = this.pos.Y  - (this.height + 20) + "px";
 	};
 
 	this.getAngle = function() {
