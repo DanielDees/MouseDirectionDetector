@@ -1,5 +1,11 @@
+"use strict";
+
 var map = new posMapper();
-map.init('greyArea');
+map.init('greyArea').setCallback(function() { 
+	if(this.blocking) { 
+		console.log("Check if a:hover and cancel if needed"); 
+	}
+});
 
 function posMapper () {
 
@@ -25,16 +31,17 @@ function posMapper () {
 	this.updateTime = 10;
 
 	//Maximum angle off map quadrant before reset
+	this.blocking = false;
 	this.maxAngle = 45;
+	this.quadrantAngles = {
+		U: [135, 225],
+		D: [315, 45],
+		L: [225, 315],
+		R: [45, 135],
+	};
 	
 	//Quadrant to check
-	this.direction = {
-
-		U: false,
-		D: false,
-		L: false,
-		R: true,
-	};
+	this.direction = 'R';
 
 	this.init = function(el) {
 
@@ -42,11 +49,9 @@ function posMapper () {
 		var run = setInterval(function() { that.update(); }, that.updateTime);
 
 		document.getElementById(el).onmouseover = function() {
-			console.log("in grey");
 			that.inElArea = true;
 		};
 		document.getElementById(el).onmouseleave = function() {
-			console.log('out grey');
 			that.inElArea = false;
 		};
 		document.onmousemove = function(e) {
@@ -54,8 +59,38 @@ function posMapper () {
 				that.checkDirection(e.pageX, e.pageY);
 			    that.pos.X = e.pageX;
 			    that.pos.Y = e.pageY;
+
+			   	that.callback(that);
 			}
 		};
+
+		return this;
+	};
+
+	this.setCallback = function(fn) {
+		
+		this.callback = fn;
+
+		return this;
+	};
+
+	this.setMaxAngle = function(angle) {
+
+		this.angle = angle;
+
+		return this;
+	}
+
+	this.setMaxStopTime = function(time) {
+		
+		this.maxStopTime = time;	
+
+		return this;
+	};
+
+	this.callback = function() {
+
+		return this;
 	};
 
 	this.updatePointOnPage = function() {
@@ -64,8 +99,26 @@ function posMapper () {
 		this.mapPos.Y = this.pos.Y;
 
 		document.getElementById('mouseArea').style.left = this.pos.X - (this.width / 2) + "px";
-		document.getElementById('mouseArea').style.top = this.pos.Y  - (this.height + 20) + "px";
+		document.getElementById('mouseArea').style.top = this.pos.Y - (this.height / 2) + "px";
 	};
+
+	this.isValidAngle = function(angle) {
+
+		var relative = this.maxAngle - 45;
+		var angle = this.getAngle();
+
+		var min = this.quadrantAngles[this.direction][0] - relative;
+		var max = this.quadrantAngles[this.direction][1] + relative;
+
+		if (this.direction != 'D' && angle >= min && angle <= max) { 
+			return true;
+		}
+		else if (((angle >= 0 && angle <= max) || (angle >= min)) && this.direction == 'D') {
+			return true; 
+		}
+
+		return false;
+	}
 
 	this.getAngle = function() {
 
@@ -87,14 +140,15 @@ function posMapper () {
 
 	this.checkDirection = function(newX, newY) {
 
-		var angle = Math.abs(this.getAngle() - 90);
-		document.getElementById('mouseArea').innerHTML = angle.toFixed(0);
+		document.getElementById('mouseArea').innerHTML = this.getAngle().toFixed(0);
+
+		this.blocking = this.isValidAngle();
 
 		//If mouse is moving in correct direction
-		if (this.direction.R && newX >= this.pos.X && angle < this.maxAngle) { return true; }
-		else if (this.direction.L && newX <= this.pos.X) { return true; }
-		else if (this.direction.U && newY >= this.pos.Y) { return true; }
-		else if (this.direction.D && newY <= this.pos.Y) { return true; };
+		if (this.direction == 'R' && newX >= this.pos.X && this.blocking) { return true; }
+		else if (this.direction == 'L' && newX <= this.pos.X && this.blocking) { return true; }
+		else if (this.direction == 'D' && newY >= this.pos.Y && this.blocking) { return true; }
+		else if (this.direction == 'U' && newY <= this.pos.Y && this.blocking) { return true; };
 
 		//If mouse is not moving in correct direction
 		this.updatePointOnPage();
