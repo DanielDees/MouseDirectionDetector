@@ -41,12 +41,9 @@ function posMapper () {
 		var that = this;
 		setInterval(function() { that.update(); }, that.updateTime);
 
-		document.getElementById(el).onmouseover = function() {
-			that.inElArea = true;
-		};
-		document.getElementById(el).onmouseleave = function() {
-			that.inElArea = false;
-		};
+		el.onmouseover = function() { that.inElArea = true; };
+		el.onmouseleave = function() { that.inElArea = false; };
+		
 		document.onmousemove = function(e) {
 			if (that.inElArea) {
 				that.checkDirection(e.pageX, e.pageY);
