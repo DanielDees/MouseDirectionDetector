@@ -6,11 +6,11 @@ function posMapper () {
 	this.inElArea = false;
 
 	//Mouse location
-	this.pos = { X: 0, Y: 0, };
+	this.cursor = { X: 0, Y: 0, };
 	//Stop location
 	this.stopPos = { X: 0, Y: 0, };
 	//Map location
-	this.mapPos = { X: 0, Y: 0, };
+	this.start = { X: 0, Y: 0, };
 
 	//Div attributes
 	this.width = 60;
@@ -24,7 +24,7 @@ function posMapper () {
 	this.updateTime = 10;
 
 	//Maximum angle off map quadrant before reset
-	this.blocking = false;
+	this.validMoveAngle = false;
 	this.maxAngle = 45;
 	this.quadrantAngles = {
 		U: [135, 225],
@@ -39,7 +39,7 @@ function posMapper () {
 	this.init = function(el) {
 
 		var that = this;
-		var run = setInterval(function() { that.update(); }, that.updateTime);
+		setInterval(function() { that.update(); }, that.updateTime);
 
 		document.getElementById(el).onmouseover = function() {
 			that.inElArea = true;
@@ -50,8 +50,8 @@ function posMapper () {
 		document.onmousemove = function(e) {
 			if (that.inElArea) {
 				that.checkDirection(e.pageX, e.pageY);
-			    that.pos.X = e.pageX;
-			    that.pos.Y = e.pageY;
+			    that.cursor.X = e.pageX;
+			    that.cursor.Y = e.pageY;
 
 			   	that.callback(that);
 			}
@@ -59,43 +59,32 @@ function posMapper () {
 
 		return this;
 	};
-
-	this.setCallback = function(fn) {
-		
+	this.setCallback = function(fn) {	
 		this.callback = fn;
-
 		return this;
 	};
-
 	this.setMaxAngle = function(angle) {
-
 		this.maxAngle = angle;
-
 		return this;
-	}
-
+	};
 	this.setMaxStopTime = function(time) {
-		
-		this.maxStopTime = time;	
-
+		this.maxStopTime = time;
 		return this;
 	};
-
 	this.callback = function() {
-
 		return this;
 	};
-
-	this.updatePointOnPage = function() {
+	this.updateStartLocation = function() {
 		
-		this.mapPos.X = this.pos.X;
-		this.mapPos.Y = this.pos.Y;
+		this.start.X = this.cursor.X;
+		this.start.Y = this.cursor.Y;
 
-		document.getElementById('mouseArea').style.left = this.pos.X - (this.width / 2) + "px";
-		document.getElementById('mouseArea').style.top = this.pos.Y - (this.height / 2) + "px";
+		document.getElementById('mouseArea').style.left = this.start.X + "px";
+		document.getElementById('mouseArea').style.top = this.start.Y + "px";
 	};
 
-	this.isValidAngle = function(angle) {
+	//Get whether or not mouse is moving in the correct direction/area
+	this.isValidAngle = function() {
 
 		var relative = this.maxAngle - 45;
 		var angle = this.getAngle();
@@ -113,11 +102,12 @@ function posMapper () {
 		return false;
 	}
 
+	//Get angle of mouse movement in relation to the start position
 	this.getAngle = function() {
 
-	  //Calculate center of player.
-	  var dx = this.mapPos.X - this.pos.X;
-	  var dy = this.mapPos.Y - this.pos.Y;
+	  //Calculate difference between start position and cursor position.
+	  var dx = this.start.X - this.cursor.X;
+	  var dy = this.start.Y - this.cursor.Y;
 
 	  //Find angle in Rad
 	  var angle = Math.atan2(dx, dy);
@@ -135,31 +125,30 @@ function posMapper () {
 
 		document.getElementById('mouseArea').innerHTML = this.getAngle().toFixed(0);
 
-		this.blocking = this.isValidAngle();
+		this.validMoveAngle = this.isValidAngle();
 
 		//If mouse is moving in correct direction
-		if (this.direction == 'R' && newX >= this.pos.X && this.blocking) { return true; }
-		else if (this.direction == 'L' && newX <= this.pos.X && this.blocking) { return true; }
-		else if (this.direction == 'D' && newY >= this.pos.Y && this.blocking) { return true; }
-		else if (this.direction == 'U' && newY <= this.pos.Y && this.blocking) { return true; };
+		if (this.direction == 'R' && newX >= this.cursor.X && this.validMoveAngle) { return true; }
+		else if (this.direction == 'L' && newX <= this.cursor.X && this.validMoveAngle) { return true; }
+		else if (this.direction == 'D' && newY >= this.cursor.Y && this.validMoveAngle) { return true; }
+		else if (this.direction == 'U' && newY <= this.cursor.Y && this.validMoveAngle) { return true; };
 
 		//If mouse is not moving in correct direction
-		this.updatePointOnPage();
+		this.updateStartLocation();
 		return false;
 	};
 
 	this.checkIfStopped = function() {
 		
 		//If mouse has not moved then update the map area
-		if (this.pos.X == this.stopPos.X && this.pos.Y == this.stopPos.Y) { 
-			
+		if (this.cursor.X == this.stopPos.X && this.cursor.Y == this.stopPos.Y) { 
 			this.stopTime += this.updateTime;
 			return true;
 		}
 
 		//If mouse has moved, then reset timer and update last position
-		this.stopPos.X = this.pos.X;
-		this.stopPos.Y = this.pos.Y;
+		this.stopPos.X = this.cursor.X;
+		this.stopPos.Y = this.cursor.Y;
 		this.stopTime = 0;
 		return false;
 	};
@@ -171,7 +160,7 @@ function posMapper () {
 			this.checkIfStopped();
 
 			if (this.stopTime > this.maxStopTime) { 
-				this.updatePointOnPage();
+				this.updateStartLocation();
 			};
 		}
 	};
