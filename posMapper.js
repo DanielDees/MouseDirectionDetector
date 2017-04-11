@@ -76,8 +76,8 @@ function posMapper () {
 		this.start.X = this.cursor.X;
 		this.start.Y = this.cursor.Y;
 
-		document.getElementById('mouseArea').style.left = this.start.X + "px";
-		document.getElementById('mouseArea').style.top = this.start.Y + "px";
+		document.getElementById('mouseArea').style.left = this.start.X - (this.width / 2) + "px";
+		document.getElementById('mouseArea').style.top = this.start.Y - (this.height / 2)+ "px";
 	};
 
 	//Get whether or not mouse is moving in the correct direction/area
