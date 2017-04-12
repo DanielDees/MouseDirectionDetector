@@ -26,20 +26,17 @@ function posMapper () {
 	this.updateTime = 10;
 
 	//Maximum angle off map quadrant before reset
-	this.validMoveAngle = false;
 	this.maxAngle = 45;
 
-	//This should be able to be converted into a single number for all 
-	//directions with a special case for downward movement
-	this.quadrantAngles = {
-		U: [135, 225],
-		D: [315, 45],
-		L: [225, 315],
-		R: [45, 135],
+	this.quadrant = {
+		U: 180,
+		D: 0,
+		L: 270,
+		R: 90,
 	};
 	
 	//Quadrant to check
-	this.direction = 'R';
+	this.direction = 'D';
 
 	this.init = function(type, el) {
 
@@ -75,6 +72,10 @@ function posMapper () {
 		this.maxStopTime = time;
 		return this;
 	};
+	this.setDirection = function(d) {
+		this.direction = d;
+		return this;
+	};
 	this.callback = function() {
 		return this;
 	};
@@ -101,16 +102,15 @@ function posMapper () {
 	//Get whether or not mouse is moving in the correct direction/area
 	this.isValidAngle = function() {
 
-		var relative = this.maxAngle - 45;
 		var angle = this.getAngle();
 
-		var min = this.quadrantAngles[this.direction][0] - relative;
-		var max = this.quadrantAngles[this.direction][1] + relative;
+		var min = this.quadrant[this.direction] - this.maxAngle;
+		var max = this.quadrant[this.direction] + this.maxAngle;
 
 		if (this.direction != 'D' && angle >= min && angle <= max) { 
 			return true;
 		}
-		else if (((angle >= 0 && angle <= max) || (angle >= min)) && this.direction == 'D') {
+		else if ((angle <= max || angle >= 360 - this.maxAngle) && this.direction == 'D') {
 			return true; 
 		}
 
@@ -140,13 +140,13 @@ function posMapper () {
 
 		document.getElementById('mouseAreaX').innerHTML = this.getAngle().toFixed(0);
 
-		this.validMoveAngle = this.isValidAngle();
+		var valid = this.isValidAngle();
 
 		//If mouse is moving in correct direction
-		if (this.direction == 'R' && newX >= this.cursor.X && this.validMoveAngle) { return true; }
-		else if (this.direction == 'L' && newX <= this.cursor.X && this.validMoveAngle) { return true; }
-		else if (this.direction == 'D' && newY >= this.cursor.Y && this.validMoveAngle) { return true; }
-		else if (this.direction == 'U' && newY <= this.cursor.Y && this.validMoveAngle) { return true; };
+		if (this.direction == 'R' && newX >= this.cursor.X && valid) { return true; }
+		else if (this.direction == 'L' && newX <= this.cursor.X && valid) { return true; }
+		else if (this.direction == 'D' && newY >= this.cursor.Y && valid) { return true; }
+		else if (this.direction == 'U' && newY <= this.cursor.Y && valid) { return true; };
 
 		//If mouse is not moving in correct direction
 		this.updateStartLocation();
