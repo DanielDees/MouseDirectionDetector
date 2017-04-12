@@ -56,3 +56,24 @@ body {
 #nav li:active {
 	background-color: #aa0;
 }
+
+#services-dropdown:hover .dropdown-content {
+	display: block;
+}
+
+.dropdown-content {
+	background-color: #3B0;
+	position: absolute;
+	display: none;
+}
+
+.dropdown-content a {
+	text-align: center;
+	text-decoration: none;
+	display: block;
+	padding: 10px;
+}
+
+.dropdown-content a:hover {
+	background-color: #290;
+}
