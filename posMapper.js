@@ -28,6 +28,9 @@ function posMapper () {
 	//Maximum angle off map quadrant before reset
 	this.validMoveAngle = false;
 	this.maxAngle = 45;
+
+	//This should be able to be converted into a single number for all 
+	//directions with a special case for downward movement
 	this.quadrantAngles = {
 		U: [135, 225],
 		D: [315, 45],

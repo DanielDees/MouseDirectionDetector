@@ -5,8 +5,8 @@
 }
 
 body {
-	background-color: #F8F8F8;
 	margin: 0;
+	background-color: #67AA;
 }
 
 #mouseAreaY, #mouseAreaX {
@@ -24,13 +24,6 @@ body {
 #mouseAreaY {
 	width: 1px;
 	height: 100%;
-}
-
-#greyArea {
-	width: 100%;
-	height: 400px;
-	float: right;
-	background-color: grey;
 }
 
 #nav {
