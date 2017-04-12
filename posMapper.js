@@ -4,6 +4,8 @@ function posMapper () {
 
 	//If in proper document element
 	this.inElArea = false;
+	this.el;
+	this.elType;
 
 	//Mouse location
 	this.cursor = { X: 0, Y: 0, };
@@ -36,14 +38,16 @@ function posMapper () {
 	//Quadrant to check
 	this.direction = 'R';
 
-	this.init = function(el) {
+	this.init = function(type, el) {
 
 		var that = this;
 		setInterval(function() { that.update(); }, that.updateTime);
 
-		el.onmouseover = function() { that.inElArea = true; };
-		el.onmouseleave = function() { that.inElArea = false; };
-		
+		this.el = el;
+		this.elType = type;
+		this.get_el(type, el).onmouseover = function() { that.inElArea = true; };
+		this.get_el(type, el).onmouseleave = function() { that.inElArea = false; };
+
 		document.onmousemove = function(e) {
 			if (that.inElArea) {
 				that.checkDirection(e.pageX, e.pageY);
@@ -71,13 +75,24 @@ function posMapper () {
 	this.callback = function() {
 		return this;
 	};
+	this.get_el = function(type, el) {
+
+		if (type == "id") {
+			return document.getElementById(el);
+		}
+		else if (type == "class") {
+			return document.getElementsByClassName(el);
+		}
+
+		console.log("Couldn't get: " + type + " for " + el);
+	};
 	this.updateStartLocation = function() {
 		
 		this.start.X = this.cursor.X;
 		this.start.Y = this.cursor.Y;
 
-		document.getElementById('mouseArea').style.left = this.start.X - (this.width / 2) + "px";
-		document.getElementById('mouseArea').style.top = this.start.Y - (this.height / 2)+ "px";
+		this.get_el('id', 'mouseArea').style.left = this.start.X - (this.width / 2) + "px";
+		this.get_el('id', 'mouseArea').style.top = this.start.Y - (this.height / 2) + "px";
 	};
 
 	//Get whether or not mouse is moving in the correct direction/area
