@@ -15,8 +15,8 @@ function posMapper () {
 	this.start = { X: 0, Y: 0, };
 
 	//Div attributes
-	this.width = 60;
-	this.height = 60;
+	this.width = function() { return this.get_el('id', 'mouseAreaY').style.width; };
+	this.height = function() { return this.get_el('id', 'mouseAreaX').style.height; };
 
 	//Duration since last mouse move
 	this.stopTime = 0;
@@ -91,8 +91,8 @@ function posMapper () {
 		this.start.X = this.cursor.X;
 		this.start.Y = this.cursor.Y;
 
-		this.get_el('id', 'mouseArea').style.left = this.start.X - (this.width / 2) + "px";
-		this.get_el('id', 'mouseArea').style.top = this.start.Y - (this.height / 2) + "px";
+		this.get_el('id', 'mouseAreaX').style.top = this.start.Y + "px";
+		this.get_el('id', 'mouseAreaY').style.left = this.start.X + "px";
 	};
 
 	//Get whether or not mouse is moving in the correct direction/area
@@ -135,7 +135,7 @@ function posMapper () {
 
 	this.checkDirection = function(newX, newY) {
 
-		document.getElementById('mouseArea').innerHTML = this.getAngle().toFixed(0);
+		document.getElementById('mouseAreaX').innerHTML = this.getAngle().toFixed(0);
 
 		this.validMoveAngle = this.isValidAngle();
 
