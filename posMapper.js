@@ -45,8 +45,35 @@ function posMapper () {
 
 		this.el = el;
 		this.elType = type;
-		this.get_el(type, el).onmouseover = function() { that.inElArea = true; };
-		this.get_el(type, el).onmouseleave = function() { that.inElArea = false; };
+
+		/* 
+			TODO:
+
+			The parent div ('nav') will have all of the child elements.
+			When a childelement (each link in the nav) is mouseovered,
+			Then do not trigger mouseout until the posMapper's map has
+			been updated outside of the childelement.
+			However the child element's children (dropdown links) need 
+			to be considered a part of the main child element and used
+			as part of the area that the posMapper's start location
+			detects.
+		*/
+		this.get_el(type, el).onmouseover = function() { 
+			that.inElArea = true; 
+
+			console.log("posMapper start is in X/Y bounds!");
+			var X = that.start.X;
+			var Y = that.start.Y;
+			var el = that.get_el(that.elType, that.el).getBoundingClientRect();
+		
+			if (X >= el.left && X <= el.right && Y >= el.top && Y <= el.bottom) {
+				console.log("posMapper start is in X/Y bounds!");
+			}
+		};
+		this.get_el(type, el).onmouseleave = function() { 
+			that.inElArea = false; 
+			console.log("posMapper start is NOT in X/Y bounds!"); 
+		};
 
 		document.onmousemove = function(e) {
 			if (that.inElArea) {
